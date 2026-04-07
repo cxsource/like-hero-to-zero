@@ -1,6 +1,6 @@
 # Like Hero To Zero
 
-Webanwendung zur Darstellung und Verwaltung weltweiter CO2-Emissionsdaten pro Kopf nach Laendern.
+Webanwendung zur Darstellung und Verwaltung weltweiter CO2-Emissionsdaten pro Kopf nach Ländern.
 
 **Fallstudie** im Modul *Programmierung von industriellen Informationssystemen mit Java EE* (IPWA02-01) an der IU Internationalen Hochschule.
 
@@ -31,7 +31,7 @@ Die Anwendung startet unter [http://localhost:8080](http://localhost:8080) und l
 
 | Bereich | URL | Login erforderlich |
 |---------|-----|--------------------|
-| Oeffentliche Uebersicht | http://localhost:8080/emissions | Nein |
+| Öffentliche Übersicht | http://localhost:8080/emissions | Nein |
 | Login-Seite | http://localhost:8080/login | — |
 | Wissenschaftler-Backend | http://localhost:8080/backend | Ja (siehe unten) |
 | H2-Konsole | http://localhost:8080/h2-console | Nein |
@@ -57,7 +57,7 @@ mvn spring-boot:run
 
 ### Schritt 3: Funktionalitaet pruefen
 
-1. **Oeffentliche Ansicht:** [http://localhost:8080/emissions](http://localhost:8080/emissions)
+1. **Öffentliche Ansicht:** [http://localhost:8080/emissions](http://localhost:8080/emissions)
    - Zeigt alle CO2-Emissionsdaten in einer Tabelle (ohne Login)
    - Sortierung nach Land (A-Z) oder Emissionswert moeglich
 
@@ -165,15 +165,15 @@ src/test/java/com/likeherotozero/
 
 | ID | Beschreibung | Prioritaet | Status |
 |---|---|---|---|
-| US-1 | Als Buerger:in will ich CO2-Emissionsdaten meines Landes ohne Login einsehen koennen. | MUST | Umgesetzt |
-| US-2 | Als registrierte:r Wissenschaftler:in will ich neue Klimaforschungsdaten eintragen koennen. | MUST | Umgesetzt |
-| US-3 | Als Herausgeber:in will ich sicherstellen, dass Aenderungen erst freigegeben werden muessen. | COULD | Nicht umgesetzt (Future Work) |
+| US-1 | Als Bürger:in will ich CO2-Emissionsdaten meines Landes ohne Login einsehen können. | MUST | Umgesetzt |
+| US-2 | Als registrierte:r Wissenschaftler:in will ich neue Klimaforschungsdaten eintragen können. | MUST | Umgesetzt |
+| US-3 | Als Herausgeber:in will ich sicherstellen, dass Änderungen erst freigegeben werden müssen. | COULD | Nicht umgesetzt (Future Work) |
 
 ## Sicherheitsarchitektur
 
-- **Oeffentliche Routen:** `/`, `/emissions`, `/emissions/**`, `/login` — ohne Authentifizierung
-- **Geschuetzte Routen:** `/backend/**` — erfordert Rolle `SCIENTIST`
-- **Passwortverschluesselung:** BCryptPasswordEncoder
+- **Öffentliche Routen:** `/`, `/emissions`, `/emissions/**`, `/login` — ohne Authentifizierung
+- **Geschützte Routen:** `/backend/**` — erfordert Rolle `SCIENTIST`
+- **Passwortverschlüsselung:** BCryptPasswordEncoder
 - **CSRF-Schutz:** Spring Security (automatisch auf alle POST/PUT/DELETE-Anfragen)
 - **Session-Management:** Spring Security Standard (HttpOnly + SecureFlag Cookies)
 
