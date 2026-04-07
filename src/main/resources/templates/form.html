@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Like Hero To Zero - Daten eintragen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f4f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #2d6a4f, #40916c);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .form-card {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .form-card h2 {
+            color: #2d6a4f;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.65rem 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #2d6a4f;
+            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+        }
+        .form-group .error {
+            color: #c0392b;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+        }
+        .form-group input.is-invalid {
+            border-color: #c0392b;
+        }
+        .btn-group {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.65rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: #2d6a4f;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1b4332;
+        }
+        .btn-secondary {
+            background-color: #e8e8e8;
+            color: #555;
+        }
+        .btn-secondary:hover {
+            background-color: #d0d0d0;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #777;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Kopfbereich -->
+    <div class="header">
+        <h1>Like Hero To Zero</h1>
+        <p>CO&#8322;-Emissionsdaten erfassen</p>
+    </div>
+
+    <div class="container">
+        <div class="form-card">
+            <h2 th:text="${emissionData.id != null} ? 'Emissionsdaten bearbeiten' : 'Neue Emissionsdaten eintragen'">
+                Neue Emissionsdaten eintragen
+            </h2>
+
+            <!--
+                Formular mit th:object zur Datenbindung an das EmissionData-Objekt.
+                Entspricht konzeptionell den Value Expressions (#{bean.attribut}) in JSF.
+            -->
+            <form th:action="@{/backend/save}" th:object="${emissionData}" method="post">
+
+                <!-- Verstecktes Feld fuer die ID (bei Bearbeitung) -->
+                <input type="hidden" th:field="*{id}" />
+
+                <!-- Land -->
+                <div class="form-group">
+                    <label for="country">Land</label>
+                    <input type="text"
+                           th:field="*{country}"
+                           id="country"
+                           placeholder="z.B. Deutschland"
+                           th:classappend="${#fields.hasErrors('country')} ? 'is-invalid' : ''" />
+                    <div class="error" th:if="${#fields.hasErrors('country')}" th:errors="*{country}"></div>
+                </div>
+
+                <!-- Jahr -->
+                <div class="form-group">
+                    <label for="year">Jahr</label>
+                    <input type="number"
+                           th:field="*{year}"
+                           id="year"
+                           placeholder="z.B. 2022"
+                           th:classappend="${#fields.hasErrors('year')} ? 'is-invalid' : ''" />
+                    <div class="error" th:if="${#fields.hasErrors('year')}" th:errors="*{year}"></div>
+                </div>
+
+                <!-- CO2-Emissionen pro Kopf -->
+                <div class="form-group">
+                    <label for="emissionsPerCapita">CO&#8322;-Emissionen pro Kopf (in Tonnen)</label>
+                    <input type="number"
+                           step="0.01"
+                           th:field="*{emissionsPerCapita}"
+                           id="emissionsPerCapita"
+                           placeholder="z.B. 8.1"
+                           th:classappend="${#fields.hasErrors('emissionsPerCapita')} ? 'is-invalid' : ''" />
+                    <div class="error" th:if="${#fields.hasErrors('emissionsPerCapita')}" th:errors="*{emissionsPerCapita}"></div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                    <a href="/backend" class="btn btn-secondary">Abbrechen</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Like Hero To Zero &ndash; Fallstudie IPWA02-01</p>
+    </div>
+
+</body>
+</html>

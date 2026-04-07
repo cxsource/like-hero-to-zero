@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Like Hero To Zero - CO2-Emissionen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f4f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #2d6a4f, #40916c);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background-color: #2d6a4f;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+        }
+        .btn:hover {
+            background-color: #1b4332;
+        }
+        .sort-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .sort-links a {
+            padding: 0.4rem 0.8rem;
+            background-color: #e8f0e8;
+            color: #2d6a4f;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            border: 1px solid #b7d7b7;
+            transition: all 0.2s;
+        }
+        .sort-links a:hover,
+        .sort-links a.active {
+            background-color: #2d6a4f;
+            color: white;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px solid #c3e6cb;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        thead {
+            background-color: #2d6a4f;
+            color: white;
+        }
+        th, td {
+            padding: 0.9rem 1rem;
+            text-align: left;
+        }
+        th {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        tbody tr {
+            border-bottom: 1px solid #e8e8e8;
+        }
+        tbody tr:hover {
+            background-color: #f5faf5;
+        }
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+        .actions-cell a {
+            color: #2d6a4f;
+            text-decoration: none;
+            margin-right: 0.8rem;
+            font-size: 0.9rem;
+        }
+        .actions-cell a.delete {
+            color: #c0392b;
+        }
+        .actions-cell a:hover {
+            text-decoration: underline;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .empty-state p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #777;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Kopfbereich -->
+    <div class="header">
+        <h1>Like Hero To Zero</h1>
+        <p>Weltweite CO&#8322;-Emissionen pro Kopf nach L&auml;ndern</p>
+    </div>
+
+    <div class="container">
+
+        <!-- Erfolgsmeldung (nach Speichern/Loeschen) -->
+        <div class="success-message" th:if="${successMessage}">
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <!-- Aktionsleiste -->
+        <div class="actions">
+            <!-- Login-Button fuer Wissenschaftler -->
+            <a href="/login" class="btn">&#128274; Wissenschaftler-Login</a>
+
+            <!-- Sortierlinks (User Story US-3) -->
+            <div class="sort-links">
+                <span style="color: #666; font-size: 0.85rem; align-self: center;">Sortieren nach:</span>
+                <a href="/emissions"
+                   th:classappend="${currentSort == null} ? 'active' : ''">Standard</a>
+                <a href="/emissions?sort=country"
+                   th:classappend="${currentSort == 'country'} ? 'active' : ''">Land (A-Z)</a>
+                <a href="/emissions?sort=emissionsDesc"
+                   th:classappend="${currentSort == 'emissionsDesc'} ? 'active' : ''">Emissionen &#8595;</a>
+                <a href="/emissions?sort=emissionsAsc"
+                   th:classappend="${currentSort == 'emissionsAsc'} ? 'active' : ''">Emissionen &#8593;</a>
+            </div>
+        </div>
+
+        <!-- Datentabelle (User Story US-1) -->
+        <table th:if="${!emissions.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>Land</th>
+                    <th>Jahr</th>
+                    <th>CO&#8322;-Emissionen pro Kopf (t)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="emission : ${emissions}">
+                    <td th:text="${emission.country}"></td>
+                    <td th:text="${emission.year}"></td>
+                    <td th:text="${#numbers.formatDecimal(emission.emissionsPerCapita, 1, 2)}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Leerer Zustand -->
+        <div class="empty-state" th:if="${emissions.isEmpty()}">
+            <p>Noch keine Emissionsdaten vorhanden.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Like Hero To Zero &ndash; Fallstudie IPWA02-01 | <a href="/login" style="color: #2d6a4f; text-decoration: none;">Wissenschaftler-Login</a></p>
+    </div>
+
+</body>
+</html>

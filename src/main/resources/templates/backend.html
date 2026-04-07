@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Like Hero To Zero - Backend</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f4f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #2d6a4f, #40916c);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .header-content h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .header-content p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .logout-btn {
+            padding: 0.6rem 1.2rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .public-link {
+            padding: 0.6rem 1.2rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: background-color 0.2s;
+        }
+        .public-link:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background-color: #2d6a4f;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+        }
+        .btn:hover {
+            background-color: #1b4332;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px solid #c3e6cb;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        thead {
+            background-color: #2d6a4f;
+            color: white;
+        }
+        th, td {
+            padding: 0.9rem 1rem;
+            text-align: left;
+        }
+        th {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        tbody tr {
+            border-bottom: 1px solid #e8e8e8;
+        }
+        tbody tr:hover {
+            background-color: #f5faf5;
+        }
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+        .actions-cell a {
+            color: #2d6a4f;
+            text-decoration: none;
+            margin-right: 0.8rem;
+            font-size: 0.9rem;
+        }
+        .actions-cell a.delete {
+            color: #c0392b;
+        }
+        .actions-cell a:hover {
+            text-decoration: underline;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .empty-state p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #777;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Kopfbereich -->
+    <div class="header">
+        <div class="header-content">
+            <h1>Like Hero To Zero - Backend</h1>
+            <p>Datenverwaltung fuer Wissenschaftler:innen</p>
+        </div>
+        <div class="header-actions">
+            <a href="/emissions" class="public-link">Öffentliche Ansicht</a>
+            <form method="post" th:action="@{/logout}" style="display: inline;">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- Erfolgsmeldung (nach Speichern/Loeschen) -->
+        <div class="success-message" th:if="${successMessage}">
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <!-- Aktionsleiste -->
+        <div class="actions">
+            <a href="/backend/new" class="btn">+ Neue Emissionsdaten eintragen</a>
+        </div>
+
+        <!-- Datentabelle -->
+        <table th:if="${!emissions.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>Land</th>
+                    <th>Jahr</th>
+                    <th>CO&#8322;-Emissionen pro Kopf (t)</th>
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="emission : ${emissions}">
+                    <td th:text="${emission.country}"></td>
+                    <td th:text="${emission.year}"></td>
+                    <td th:text="${#numbers.formatDecimal(emission.emissionsPerCapita, 1, 2)}"></td>
+                    <td class="actions-cell">
+                        <a th:href="@{/backend/edit/{id}(id=${emission.id})}">Bearbeiten</a>
+                        <a th:href="@{/backend/delete/{id}(id=${emission.id})}"
+                           class="delete"
+                           onclick="return confirm('Diesen Datensatz wirklich loeschen?');">L&ouml;schen</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Leerer Zustand -->
+        <div class="empty-state" th:if="${emissions.isEmpty()}">
+            <p>Noch keine Emissionsdaten vorhanden.</p>
+            <a href="/backend/new" class="btn">Jetzt Daten eintragen</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Like Hero To Zero &ndash; Fallstudie IPWA02-01</p>
+    </div>
+
+</body>
+</html>
